@@ -19,22 +19,30 @@
 namespace Workspaces {
     public class Widgets.Popover : Gtk.Grid {
         public Granite.Widgets.ModeButton ws_box;
-
         public Popover (int current_ws, int ws_count) {
             ws_box = new Granite.Widgets.ModeButton ();
             ws_box.expand = true;
             ws_box.orientation = Gtk.Orientation.VERTICAL;
 
-            int i = 0;
+            // Have a button to clear all
+            ws_box.append_text (@"Clear");
+            
+            // Latest clipboard entry is always the selected one 
+            ws_box.selected = 0;
 
-            while (ws_count > i) {
+
+            // Generate one button per entry
+            int i = 0;
+            while (5 > i) {
                 ++i;
                 ws_box.append_text (@"Workspace $i");
             }
-            ws_box.selected = current_ws;
+            
+            // Attach all these buttons
             attach (ws_box, 0, 0, 1, 1);
         }
 
+        
         public void add_ws_btn (int ws_count) {
             ws_box.append_text ("Workspace %d".printf (ws_count));
         }

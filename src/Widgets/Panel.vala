@@ -20,6 +20,8 @@ namespace Workspaces {
     public class Widgets.Panel : Gtk.Grid {
         private Gtk.Label ws_label;
 
+        // Lot to do but we want only an icon here
+        // so probably delete stuff
         public Panel (int cur_val) {
             valign = Gtk.Align.CENTER;
             ws_label = new Gtk.Label (@"$(cur_val + 1)");
@@ -29,8 +31,11 @@ namespace Workspaces {
             attach (ws_label, 0, 0, 1, 1);
         }
 
+        // So probably delete
         public void newval (int newval) {
             ws_label.label = @"$(newval + 1)";
         }
+
+
     }
 }

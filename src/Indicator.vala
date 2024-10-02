@@ -16,18 +16,21 @@
  *
  */
 
+
+
+ // Create indicator
 namespace Workspaces {
     public class Indicator : Wingpanel.Indicator {
         private Widgets.Popover? main_widget = null;
-        private Widgets.Panel panel_label;
-        private Services.WorkspacesManager ws_manager;
-
+        private Services.ClipboardManager clipboard_manager;
         private bool close_popover;
 
-        public Indicator () {
-            Object (code_name : "workspaces-indicator");
 
-            Gtk.IconTheme.get_default().add_resource_path("/io/elementary/desktop/wingpanel/workspaces");
+        // Defining the indicator
+        public Indicator () {
+            Object (code_name : "daclip-indicator");
+
+            Gtk.IconTheme.get_default().add_resource_path("/io/elementary/desktop/wingpanel/daclip");
 
             close_popover = true;
 
@@ -48,38 +51,7 @@ namespace Workspaces {
 
 
 
-
-
-        public override Gtk.Widget get_display_widget () {
-            if (panel_label == null) {
-                panel_label = new Widgets.Panel (ws_manager.current_ws);
-                panel_label.scroll_event.connect ((e) => {
-                    double delta_x, delta_y;
-                    e.get_scroll_deltas (out delta_x, out delta_y);
-
-                    if (delta_y != 0 && delta_x == 0) {
-                        var current_ws = ws_manager.current_ws;
-                        if (current_ws > -1) {
-                            int next_ws = current_ws - (int) delta_y;
-                            if (next_ws > -1 && next_ws < ws_manager.ws_count) {
-                                DateTime now_dt = new DateTime.now_local ();
-                                ws_manager.screen.get_workspace (next_ws).activate ((uint32) now_dt.to_unix ());
-                            }
-                        }
-                    }
-
-                    return true;
-                });
-            }
-
-            return panel_label;
-        }
-
-
-
-
-
-        
+        // Popover generation
         public override Gtk.Widget? get_widget () {
             if (main_widget == null) {
                 var current_ws = ws_manager.current_ws;
@@ -101,8 +73,11 @@ namespace Workspaces {
             return main_widget;
         }
 
+
+
+
+        // Changed state of popover
         private void on_changed_mode () {
-            DateTime now_dt = new DateTime.now_local ();
             ws_manager.screen.get_workspace (main_widget.ws_box.selected).activate ((uint32) now_dt.to_unix ());
             close ();
         }
@@ -119,6 +94,10 @@ namespace Workspaces {
     }
 }
 
+
+
+
+// Connect Indicator
 public Wingpanel.Indicator? get_indicator (Module module, Wingpanel.IndicatorManager.ServerType server_type) {
     debug ("Activating Workspaces Indicator");
 

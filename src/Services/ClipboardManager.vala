@@ -16,26 +16,91 @@
  *
  */
 
-namespace Workspaces {
-    public class Services.WorkspacesManager : GLib.Object {
-        public Wnck.Screen screen;
 
-        public int current_ws {
-            get {
-                unowned Wnck.Workspace ws = screen.get_active_workspace ();
-                return ws == null ? -1 : ws.get_number ();
+// The clipboard itself
+class Services.ClipboardManager : GLib.Object {
+    private Gtk.Clipboard clipboard = null;
+    public signal void on_text_copied (string text);
+
+
+    // Get clipboard
+    public ClipboardManager () {
+        clipboard = Gtk.Clipboard.get (Gdk.SELECTION_CLIPBOARD);
+    }
+
+    ~ClipboardManager () {
+        clipboard.owner_change.disconnect (on_clipboard_event);
+    }
+
+
+
+    // Listen to cliboard events ?
+    public virtual void start () {
+        clipboard.owner_change.connect (on_clipboard_event);
+    }
+
+
+    // called when clipboard change
+    private void on_clipboard_event () {
+
+        // Get the gud shit
+        string? text = request_text ();
+
+        // Is either something or not
+        bool text_available = (text != null && text != "") || clipboard.wait_is_text_available ();
+
+        // if we got something
+        if (text_available) {
+
+            // Its not null
+            if (text != null && text != "") {
+                on_text_copied (text);
             }
         }
 
-        public int ws_count {
-            get {
-                return screen.get_workspace_count ();
-            }
-        }
 
-        public WorkspacesManager () {
-            screen = Wnck.Screen.get_default();
-            screen.force_update();
+    }
+
+
+    // idk
+    private string? request_text () {
+        string? result = clipboard.wait_for_text ();
+        return result;
+    }
+
+
+    // seems to artificially paste text ?
+    public void paste () {
+        perform_key_event ("<Control>v", true, 100);
+        perform_key_event ("<Control>v", false, 0);
+    }
+
+
+    // this seem usueless
+    private static void perform_key_event (string accelerator, bool press, ulong delay) {
+        uint keysym;
+        Gdk.ModifierType modifiers;
+        Gtk.accelerator_parse (accelerator, out keysym, out modifiers);
+        unowned X.Display display = Gdk.X11.get_default_xdisplay ();
+        int keycode = display.keysym_to_keycode (keysym);
+
+        if (keycode != 0) {
+            if (Gdk.ModifierType.CONTROL_MASK in modifiers) {
+                int modcode = display.keysym_to_keycode (Gdk.Key.Control_L);
+                XTest.fake_key_event (display, modcode, press, delay);
+            }
+
+            if (Gdk.ModifierType.SHIFT_MASK in modifiers) {
+                int modcode = display.keysym_to_keycode (Gdk.Key.Shift_L);
+                XTest.fake_key_event (display, modcode, press, delay);
+            }
+
+            XTest.fake_key_event (display, keycode, press, delay);
         }
     }
+
+
+
+
+
 }
