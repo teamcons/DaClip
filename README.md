@@ -23,3 +23,8 @@ First time i mess with Vala
     meson build --prefix /usr
     ninja -C build
     sudo ninja -C build install
+
+
+
+### ORRRRR
+

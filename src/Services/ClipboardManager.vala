@@ -23,25 +23,26 @@ class Services.ClipboardManager : GLib.Object {
     public signal void on_text_copied (string text);
 
 
-    // Get clipboard
+    public var entries = new List<string> ()
+    int max_size = 5
+
+
+    // Get clipboard instance
     public ClipboardManager () {
         clipboard = Gtk.Clipboard.get (Gdk.SELECTION_CLIPBOARD);
     }
 
-    ~ClipboardManager () {
-        clipboard.owner_change.disconnect (on_clipboard_event);
+
+    // retrieve from owned clipboard
+    private string? request_text () {
+        string? result = clipboard.wait_for_text ();
+        return result;
     }
+    
 
-
-
-    // Listen to cliboard events ?
-    public virtual void start () {
-        clipboard.owner_change.connect (on_clipboard_event);
-    }
-
-
-    // called when clipboard change
-    private void on_clipboard_event () {
+    // Add to list
+    private void add_latest_entry()
+    {
 
         // Get the gud shit
         string? text = request_text ();
@@ -54,25 +55,60 @@ class Services.ClipboardManager : GLib.Object {
 
             // Its not null
             if (text != null && text != "") {
-                on_text_copied (text);
+
+
+
+                entries.insert(0,text)
+
+                // If too much
+                // remove last one
+                if (entries.length > max_size)
+                {
+                    entries.remove_index(max_size)
+                }
+
+                //on_text_copied (text);
             }
         }
-
-
-    }
-
-    // idk
-    private string? request_text () {
-        string? result = clipboard.wait_for_text ();
-        return result;
     }
 
 
 
+    // Start the clipboard service
+    public virtual void start () {
+        add_latest_entry
+        clipboard.owner_change.connect (on_clipboard_event);
+    }
 
+
+
+    // called when clipboard change
+    // add a new first element to entries. Remove last element. Regenerate list
+    private void on_clipboard_event () {
+        add_latest_entry
+
+    }
+
+
+    // Stop listening
+    ~ClipboardManager () {
+        clipboard.owner_change.disconnect (on_clipboard_event);
+    }
 
 }
 
 
 
 // HMMN https://gist.github.com/voldyman/6ba4bf5fe888e85ba06f
+
+
+
+// we need
+
+
+// regenerate list : clear all buttons. For each entry, create a button with text 40 first characters and onclick: position in entry list.
+
+// On clipboard changed --> add a new first element to entries. Remove last element. Regenerate list
+// clear -->> empty clipboard immediately.
+
+// on click button: set clipboard to item 

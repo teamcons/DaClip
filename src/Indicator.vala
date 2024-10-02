@@ -73,24 +73,6 @@ namespace Workspaces {
             return main_widget;
         }
 
-
-
-
-        // Changed state of popover
-        private void on_changed_mode () {
-            ws_manager.screen.get_workspace (main_widget.ws_box.selected).activate ((uint32) now_dt.to_unix ());
-            close ();
-        }
-
-        public override void opened () {
-            close_popover = false;
-            main_widget.ws_box.mode_changed.connect (on_changed_mode);
-        }
-
-        public override void closed () {
-            main_widget.ws_box.mode_changed.disconnect (on_changed_mode);
-            close_popover = true;
-        }
     }
 }
 
@@ -101,6 +83,7 @@ namespace Workspaces {
 public Wingpanel.Indicator? get_indicator (Module module, Wingpanel.IndicatorManager.ServerType server_type) {
     debug ("Activating Workspaces Indicator");
 
+    // Only wingpanel
     if (server_type != Wingpanel.IndicatorManager.ServerType.SESSION) {
         return null;
     }
