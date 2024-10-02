@@ -72,3 +72,7 @@ class Services.ClipboardManager : GLib.Object {
 
 
 }
+
+
+
+// HMMN https://gist.github.com/voldyman/6ba4bf5fe888e85ba06f

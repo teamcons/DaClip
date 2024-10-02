@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/com/github/teamcons/daclip/" id="com.github.teamcons.daclip">
+    <key type="u" name="clipboard-entries">
+      <default>5</default>
+      <summary>How many entries to keep in the clipboard</summary>
+      <description>How many entries the clipboard shows up on popover that you can switch to</description>
+    </key>
+  </schema>
+</schemalist>
