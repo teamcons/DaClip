@@ -61,42 +61,10 @@ class Services.ClipboardManager : GLib.Object {
 
     }
 
-
     // idk
     private string? request_text () {
         string? result = clipboard.wait_for_text ();
         return result;
-    }
-
-
-    // seems to artificially paste text ?
-    public void paste () {
-        perform_key_event ("<Control>v", true, 100);
-        perform_key_event ("<Control>v", false, 0);
-    }
-
-
-    // this seem usueless
-    private static void perform_key_event (string accelerator, bool press, ulong delay) {
-        uint keysym;
-        Gdk.ModifierType modifiers;
-        Gtk.accelerator_parse (accelerator, out keysym, out modifiers);
-        unowned X.Display display = Gdk.X11.get_default_xdisplay ();
-        int keycode = display.keysym_to_keycode (keysym);
-
-        if (keycode != 0) {
-            if (Gdk.ModifierType.CONTROL_MASK in modifiers) {
-                int modcode = display.keysym_to_keycode (Gdk.Key.Control_L);
-                XTest.fake_key_event (display, modcode, press, delay);
-            }
-
-            if (Gdk.ModifierType.SHIFT_MASK in modifiers) {
-                int modcode = display.keysym_to_keycode (Gdk.Key.Shift_L);
-                XTest.fake_key_event (display, modcode, press, delay);
-            }
-
-            XTest.fake_key_event (display, keycode, press, delay);
-        }
     }
 
 
